@@ -1,0 +1,45 @@
+#This query retrieves product information along with the total quantity ordered
+and the average unit price for products that have been ordered more than 100 times.
+
+create database orderdb;
+
+use orderdb;
+
+create table products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(20)
+);
+
+create table orders (
+    order_id INT PRIMARY KEY,
+    product_id INT,
+    quantity INT,
+    unit_price DECIMAL(10, 2),
+    FOREIGN KEY (product_id) references products(product_id)
+);
+
+insert into products (product_id, product_name) values
+    (1, 'Product A'),
+    (2, 'Product B'),
+    (3, 'Product C');
+
+insert into  orders (order_id, product_id, quantity, unit_price) values
+    (1, 1, 50, 10.50),
+    (2, 1, 70, 9.75),
+    (3, 2, 120, 15.25),
+    (4, 3, 80, 8.99),
+    (5, 1, 30, 11.25);
+
+select * from products;
+
+select * from orders;
+
+select p.product_id,p.product_name,
+    SUM(o.quantity) AS total_quantity_ordered,
+    AVG(o.unit_price) AS average_unit_price
+from products p
+JOIN orders o ON p.product_id = o.product_id
+GROUP BY  p.product_id, p.product_name
+HAVING SUM(o.quantity)> 100
+ORDER BY AVG(o.unit_price) DESC;
+
